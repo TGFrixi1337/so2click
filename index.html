@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOLDTAP - Заработай голду</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #121212;
+            margin: 0;
+            padding: 0;
+            color: #FFD700; /* Золотой цвет текста */
+        }
+
+        header {
+            background-color: #000;
+            color: #FFD700;
+            padding: 20px;
+            font-size: 24px;
+        }
+
+        .container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .balance {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        #task-image {
+            width: 250px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: transform 0.1s ease-in-out; /* Анимация */
+        }
+
+        .task, .referral {
+            margin: 20px auto;
+            width: 300px;
+            padding: 20px;
+            background-color: #1C1C1C;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+        }
+
+        .task img {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #ffea00;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        GoldTap - Зарабатывай Голду!
+    </header>
+
+    <div class="container">
+        <!-- Баланс -->
+        <div class="balance">
+            Ваш баланс: <span id="balance">0</span> голды
+        </div>
+
+        <!-- Картинка тапалки -->
+        <img src="your-image.png" id="task-image" alt="Тапалка">
+
+        <!-- Раздел реферальной системы -->
+        <div class="referral">
+            <h2>Получить реферальную ссылку</h2>
+            <button id="generate-link" class="btn">Создать реферальную ссылку</button>
+            <p>Ваша реферальная ссылка: <span id="referral-link"></span></p>
+        </div>
+
+        <!-- Раздел с заданиями -->
+        <h2>Задания</h2>
+        <div class="task">
+            <h3>Верефицируйся через WhatsApp</h3>
+            <img src="task.png" alt="Задание 1">
+            <p>Награда: 3 монеты</p>
+            <a href="/task/1/123" class="btn">Перейти к заданию</a>
+        </div>
+
+        <div class="task">
+            <h3>Задание 2</h3>
+            <img src="task.png" alt="Подпишись на телеграмм">
+            <p>Награда: 3 монеты</p>
+            <a href="/task/2/123" class="btn">Перейти к заданию</a>
+        </div>
+    </div>
+
+    <footer>
+        © 2024 GOLDTAP. По всем вопросам t.me/Ric_GOLD.
+    </footer>
+
+    <script>
+        let balance = 0; // Локальный баланс для демонстрации
+
+        // Анимация трясения при нажатии на картинку
+        document.getElementById('task-image').addEventListener('click', function() {
+            const image = this;
+            
+            // Добавляем трясение
+            image.style.transform = 'scale(0.95) rotate(1deg)'; // Изменение размеров и легкий поворот
+            setTimeout(function() {
+                image.style.transform = 'scale(1) rotate(0deg)'; // Возвращение к исходному состоянию
+            }, 100);
+
+            // Начисление монет
+            balance += 0.001; // Добавляем 0.001 монеты
+            document.getElementById('balance').innerText = balance.toFixed(3); // Обновляем баланс
+        });
+
+        // Генерация реферальной ссылки
+        document.getElementById('generate-link').addEventListener('click', function() {
+            const userId = 123; // Идентификатор пользователя (например, из сессии)
+
+            fetch(`/generate-referral/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('referral-link').innerText = data.referralLink;
+                })
+                .catch(error => console.error('Ошибка:', error));
+        });
+    </script>
+</body>
+</html>
