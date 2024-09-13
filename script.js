@@ -21,7 +21,7 @@ const bot = new Telegraf(BOT_TOKEN);
 function generateReferralLink(userId) {
     const referralCode = `${userId}_${Math.random().toString(36).substring(7)}`;
     referralLinks[referralCode] = userId; // Привязываем код к пользователю
-    return `https://tgfrixi1337.github.io/so2click/referral/${referralCode}`;
+    return `https://t.me/gold_ricbot/ref/${referralCode}`;
 }
 
 // API для создания реферальной ссылки на сайте
