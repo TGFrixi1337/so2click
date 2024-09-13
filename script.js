@@ -9,7 +9,7 @@ app.use(express.static('public')); // Для статических файлов
 let users = {}; // Простая база данных (в памяти)
 let referralLinks = {};
 let tasks = [
-    { id: 1, name: 'Задание 1', reward: 3, link: 'https://t.me/Ric_GOLD' },
+    { id: 1, name: 'Задание 1', reward: 100, link: 'https://t.me/Ric_GOLD' },
     { id: 2, name: 'Задание 2', reward: 3, link: 'https://t.me/RIC_GOLDA' },
 ];
 
