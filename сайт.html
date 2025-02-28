@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FullScreen Sound</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { width: 100%; height: 100%; background: black; display: flex; justify-content: center; align-items: center; }
+        #start { width: 100%; height: 100%; background: black; color: white; font-size: 24px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <button id="start">таптап</button>
+    <audio id="audio" loop>
+        <source src="audio.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+
+    <script>
+        const button = document.getElementById("start");
+        const audio = document.getElementById("audio");
+
+        // Функция возврата в полноэкранный режим
+        function forceFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(console.error);
+            }
+        }
+
+        button.addEventListener("click", async () => {
+            await forceFullScreen();
+            
+            audio.volume = 1.0;
+            audio.play();
+
+            button.style.display = "none";
+
+            // Следим за выходом из полноэкранного режима
+            document.addEventListener("fullscreenchange", () => {
+                setTimeout(forceFullScreen, 100);
+            });
+
+            // Автоматическая загрузка страницы в офлайн
+            downloadOfflinePage();
+        });
+
+        // Блокировка изменения громкости
+        Object.defineProperty(HTMLMediaElement.prototype, 'volume', {
+            set: function() {}
+        });
+
+        // Блокировка клавиш выхода и DevTools
+        document.addEventListener("keydown", (e) => {
+            if (["F1", "F4", "F5", "F12"].includes(e.key) || 
+                (e.ctrlKey && ["w", "r", "u", "i", "j", "s", "h", "k"].includes(e.key.toLowerCase())) || 
+                (e.altKey && e.key.toLowerCase() === "f4")) {
+                e.preventDefault();
+            }
+        });
+
+        // Блокировка закрытия вкладки
+        window.addEventListener("beforeunload", (e) => {
+            e.preventDefault();
+            e.returnValue = "Вы уверены, что хотите покинуть страницу?";
+        });
+
+        // Блокировка DevTools через mousemove
+        setInterval(() => {
+            if (window.outerHeight - window.innerHeight > 200 || window.outerWidth - window.innerWidth > 200) {
+                document.body.innerHTML = "";
+                alert("Закрой DevTools!");
+                location.reload();
+            }
+        }, 1000);
+
+        // Автозагрузка страницы для оффлайн-доступа
+        function downloadOfflinePage() {
+            const pageContent = document.documentElement.outerHTML;
+            const blob = new Blob([pageContent], { type: 'text/html' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'offline_page.html';
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Ставим звук на максимум при загрузке страницы
+        window.addEventListener("load", () => {
+            audio.volume = 1.0;
+        });
+
+    </script>
+</body>
+</html>
