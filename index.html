@@ -74,6 +74,11 @@
             function blockExit() {
                 window.history.pushState(null, "", window.location.href);
                 window.addEventListener("popstate", function() {
+                    // Блокируем выход из полноэкранного режима
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen().catch(console.error);
+                    }
+                    // Возвращаем пользователя на страницу
                     window.history.pushState(null, "", window.location.href);
                     alert("Выход невозможен!");
                 });
